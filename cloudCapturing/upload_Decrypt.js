@@ -1,7 +1,7 @@
-var rsaenc = require('./rsaenc.js')
-const decrypt = require('./decrypt.js');
-const verify = require('./verify.js');
-const delFile = require('./delFile.js')
+var rsaenc = require('./upload_Decrypt/rsaenc.js')
+const decrypt = require('./upload_Decrypt/decrypt.js');
+const verify = require('./upload_Decrypt/verify.js');
+const delFile = require('./upload_Decrypt/delFile.js')
 
 const upload_decrypt = function (req,callback){
     var ipaddr = req.body.ip_addr
