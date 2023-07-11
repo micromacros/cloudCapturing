@@ -41,7 +41,7 @@ async function decrypt(inputFile,outputFile,keyFile,pubKey,callback) {
     fs.stat(inputFile, (err, stats) => {
       if (!err) {
         var fileSize = stats.size
-        time = 200*Math.ceil(fileSize/10000000)
+        time = 300*Math.ceil(fileSize/10000000)
         console.log(time)
       }
     })
@@ -72,7 +72,7 @@ async function decrypt(inputFile,outputFile,keyFile,pubKey,callback) {
         return callback(true, inputFile)
     }else{
         delFile('./upload_Decrypt/public/decryptedFiles/','')
-        delFile('./upload_Decrypt/public/uploads','')
+        delFile('./upload_Decrypt/public/uploads/','')
         console.log('no file saved cz sus')
         return (false,null)
     }

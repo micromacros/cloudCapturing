@@ -193,9 +193,9 @@ app.post('/getVideo',upload.single('file'), function(req,res) {
     fs.writeFileSync('./upload_Decrypt/public/uploads/upload.bin', uploadFile);
     // Decrypt
     const keyDic = './upload_Decrypt/key/key.bin'
-    const path = './upload_Decrypt/public/encryptedFiles/';
-    var files = fs.readdirSync(path);
-    var file = path+files[0];
+    const encpath = './upload_Decrypt/public/encryptedFiles/';
+    var files = fs.readdirSync(encpath);
+    var file = encpath+files[0];
     var inputFile = file
     var outputFile = './upload_Decrypt/public/decryptedFiles/'
     decrypt(inputFile,outputFile,keyDic,pubKey, async (verify, decryptedFile) => {
@@ -204,8 +204,13 @@ app.post('/getVideo',upload.single('file'), function(req,res) {
           console.log('File Decrypted Successfully')
           console.log(decryptedFile)
           console.log('Converting to HLS/DASH...')
-          const filePath = `./upload_Decrypt/public/decryptedFiles/${filename}`
-          await convertMP4(filePath, fileNameNew, async (err, HLSFilePath, DASHFilePath) => {
+          var filenameList = decryptedFile.split('/')
+          var filename = filenameList[filenameList.length-1]
+          var filenameWOExt = path.parse(filename).name
+          var ext = path.extname(filename)
+          var fileNameNew = filenameWOExt.split(' ').join('-');
+          // const filePath = `./upload_Decrypt/public/decryptedFiles/${filename}`
+          await convertMP4(decryptedFile, fileNameNew, async (err, HLSFilePath, DASHFilePath) => {
             if (err) {
               console.log(err)
               //send error response for inability to convert
