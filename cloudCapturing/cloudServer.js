@@ -206,6 +206,7 @@ app.post('/getVideo',upload.single('file'), function(req,res) {
           console.log('Converting to HLS/DASH...')
           var filenameList = decryptedFile.split('/')
           var filename = filenameList[filenameList.length-1]
+          console.log(filename)
           var filenameWOExt = path.parse(filename).name
           var ext = path.extname(filename)
           var fileNameNew = filenameWOExt.split(' ').join('-');
