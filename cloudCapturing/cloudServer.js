@@ -9,6 +9,7 @@ const encrypt_segment = require('./atRest_encrypting')
 const decrypt_atRest = require('./atRest_decrypting')
 const { json } = require('stream/consumers');
 const http = require('http')
+const upload_decrypt = require('./upload_Decrypt')
 
 const app = express();
 
@@ -149,100 +150,154 @@ const listenResponse = async (proxyRes, req, res) => {
 
 };
 
-const listenRequest = (proxyReq, req, res) => {
-  
-  // console.log(proxyReq)
-  if (proxyReq.getHeader('cream_encrypted') == 'true'){
+app.post('/getVideo', function(req,res) {
+  upload_decrypt(req.body, async (err, decryptedFile) => {
+    if (err){
+      console.log('Upload Failed')
+      res.status(401).send('authfail')
+    }
+    else{
+      console.log('File Decrypted Successfully')
+      console.log(decryptedFile)
+      console.log('Converting to HLS/DASH...')
+      const filePath = `./upload_Decrypt/public/decryptedFiles/${filename}`
+      await convertMP4(filePath, fileNameNew, async (err, HLSFilePath, DASHFilePath) => {
+        if (err) {
+          console.log(err)
+          //send error response for inability to convert
+        }
+        else{
+          console.log('Video has been converted to HLS/DASH.')
+          const encryptedSegmentsBuffer = {
+            "HLS": [],
+            "DASH": []
+          }
+
+          await encryptSegments(HLSFilePath, DASHFilePath,encryptedSegmentsBuffer,fileNameNew, async () => {
+            await new Promise((resolve) => setTimeout(resolve, 15000));
+            console.log(encryptedSegmentsBuffer)
+            const targetOptions = {
+              host: '54.179.171.7',
+              port: 8081, // Replace with your server's port
+              path: '/api/uploadVideo', // Replace with the appropriate endpoint on the target server
+              method: 'POST', // Replace with the appropriate HTTP method
+              headers: {
+                'content-type': 'application/json',
+                'dataType': 'json',
+                'segment_encrypted': 'true',
+                'filename': filename
+              },
+            };
     
-    let encryptedData = '';
-    try{
-      req.on('data', (chunk) => {
-        encryptedData += chunk;
-      });
-      
-      req.on('end', async () => {
-        // Do something with the encryptedObject
-        proxyReq.end()
-        encryptedJSON = encryptedData.toString();
-        encryptedObject = JSON.parse(encryptedJSON);
-        console.log(encryptedObject);
-        var filename = proxyReq.getHeader('filename')
-        var filenameWOExt = path.parse(filename).name
-        var ext = path.extname(filename)
-        var fileNameNew = filenameWOExt.split(' ').join('-');
-        await decrypt_upload(proxyReq, encryptedObject, async (err, decryptedFile) => {
-          if (err){
-            if (err == 401){
-              console.log('File Verification Failed')
-              res.status(401)
-              res.send()
-            }
-            else if (err){
-              console.log(err)
-            }
-          }
-          else{
-            console.log('File Decrypted Successfully')
-            console.log(decryptedFile)
-            console.log('Converting to HLS/DASH...')
-            const filePath = `./upload_decryption/public/decryptedFile/${filename}`
-            await convertMP4(filePath, fileNameNew, async (err, HLSFilePath, DASHFilePath) => {
-              if (err) {
-                console.log(err)
-                //send error response for inability to convert
-              }
-              else{
-                console.log('Video has been converted to HLS/DASH.')
-                const encryptedSegmentsBuffer = {
-                  "HLS": [],
-                  "DASH": []
-                }
-
-                await encryptSegments(HLSFilePath, DASHFilePath,encryptedSegmentsBuffer,fileNameNew, async () => {
-                  await new Promise((resolve) => setTimeout(resolve, 8000));
-                  console.log(encryptedSegmentsBuffer)
-                  const targetOptions = {
-                    host: '54.179.171.7',
-                    port: 8081, // Replace with your server's port
-                    path: '/uploadVideo', // Replace with the appropriate endpoint on the target server
-                    method: 'POST', // Replace with the appropriate HTTP method
-                    headers: {
-                      'content-type': 'application/json',
-                      'dataType': 'json',
-                      'segment_encrypted': 'true',
-                      'filename': filename
-                    },
-                  };
-          
-                  const targetReq = http.request(targetOptions, (targetRes) => {
-                    targetRes.pipe(res);
-                  });
-          
-                  // Write the encrypted object to the request body
-                  targetReq.write(JSON.stringify(encryptedSegmentsBuffer));
-                  targetReq.end();
-                  console.log('New Request sent successfully')
-        
-
-                }) 
-
-
-              }
-
-
-            })
-
-            
-          }
-        })
+            const targetReq = http.request(targetOptions, (targetRes) => {
+              targetRes.pipe(res);
+            });
+    
+            // Write the encrypted object to the request body
+            targetReq.write(JSON.stringify(encryptedSegmentsBuffer));
+            targetReq.end();
+            console.log('New Request sent successfully')
+          }) 
+        }
       })
     }
-    catch(error) {
-      console.log(err)
-      return
-    }
-  }
-}
+  })
+})
+
+// const listenRequest = (proxyReq, req, res) => {
+  
+//   // console.log(proxyReq)
+//   if (proxyReq.getHeader('cream_encrypted') == 'true'){
+    
+//     let encryptedData = '';
+//     try{
+//       req.on('data', (chunk) => {
+//         encryptedData += chunk;
+//       });
+      
+//       req.on('end', async () => {
+//         // Do something with the encryptedObject
+//         proxyReq.end()
+//         encryptedJSON = encryptedData.toString();
+//         encryptedObject = JSON.parse(encryptedJSON);
+//         console.log(encryptedObject);
+//         var filename = proxyReq.getHeader('filename')
+//         var filenameWOExt = path.parse(filename).name
+//         var ext = path.extname(filename)
+//         var fileNameNew = filenameWOExt.split(' ').join('-');
+//         await decrypt_upload(proxyReq, encryptedObject, async (err, decryptedFile) => {
+//           if (err){
+//             if (err == 401){
+//               console.log('File Verification Failed')
+//               res.status(401)
+//               res.send()
+//             }
+//             else if (err){
+//               console.log(err)
+//             }
+//           }
+//           else{
+//             console.log('File Decrypted Successfully')
+//             console.log(decryptedFile)
+//             console.log('Converting to HLS/DASH...')
+//             const filePath = `./upload_decryption/public/decryptedFile/${filename}`
+//             await convertMP4(filePath, fileNameNew, async (err, HLSFilePath, DASHFilePath) => {
+//               if (err) {
+//                 console.log(err)
+//                 //send error response for inability to convert
+//               }
+//               else{
+//                 console.log('Video has been converted to HLS/DASH.')
+//                 const encryptedSegmentsBuffer = {
+//                   "HLS": [],
+//                   "DASH": []
+//                 }
+
+//                 await encryptSegments(HLSFilePath, DASHFilePath,encryptedSegmentsBuffer,fileNameNew, async () => {
+//                   await new Promise((resolve) => setTimeout(resolve, 15000));
+//                   console.log(encryptedSegmentsBuffer)
+//                   const targetOptions = {
+//                     host: '54.179.171.7',
+//                     port: 8081, // Replace with your server's port
+//                     path: '/api/uploadVideo', // Replace with the appropriate endpoint on the target server
+//                     method: 'POST', // Replace with the appropriate HTTP method
+//                     headers: {
+//                       'content-type': 'application/json',
+//                       'dataType': 'json',
+//                       'segment_encrypted': 'true',
+//                       'filename': filename
+//                     },
+//                   };
+          
+//                   const targetReq = http.request(targetOptions, (targetRes) => {
+//                     targetRes.pipe(res);
+//                   });
+          
+//                   // Write the encrypted object to the request body
+//                   targetReq.write(JSON.stringify(encryptedSegmentsBuffer));
+//                   targetReq.end();
+//                   console.log('New Request sent successfully')
+        
+
+//                 }) 
+
+
+//               }
+
+
+//             })
+
+            
+//           }
+//         })
+//       })
+//     }
+//     catch(error) {
+//       console.log(err)
+//       return
+//     }
+//   }
+// }
 
 
 // Proxy middleware
@@ -251,7 +306,7 @@ const proxyOptions = {
   changeOrigin: true,
   selfHandleResponse: true,
   onProxyRes:listenResponse,
-  onProxyReq: listenRequest
+  // onProxyReq: listenRequest
   // Additional options if needed
 };
 

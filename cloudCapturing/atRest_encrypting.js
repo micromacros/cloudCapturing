@@ -43,10 +43,10 @@ const crypto_process = async (segmentPath, outputFilePath, filename, callback) =
     const encryptionListFile = './encryptAtRest/encryption-list/encryptionLst.txt'
 
     // get private key of server
-    const serverPrivateKey = './key/server-private-key/private_key.pem'
+    const serverPrivateKey = '../cloud-dashboard/Cloud-Page/Backend/RSA_Cloud/private_key.pem'
 
     //get public key of client
-    const clientPublicKey = './key/server-public-key/public_key.pem'
+    const clientPublicKey = '../cloud-dashboard/Cloud-Page/Backend/RSA_Cloud/public_key.pem'
 
     // generate digital signature
     console.log('generating signature...')

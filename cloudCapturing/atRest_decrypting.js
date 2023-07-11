@@ -91,8 +91,8 @@ const decrypt_process = async (proxyRes, sigFile, encKeyFile,atRestList, callbac
     console.log('Encrypted File Written')
 
     var decKeyFilePath = './key/uploadKeyFile/key.bin'
-    var serverPrivateKey = './key/server-private-key/private_key.pem'
-    var clientPublicKey = './key/server-public-key/public_key.pem'
+    var serverPrivateKey = '../cloud-dashboard/Cloud-Page/Backend/RSA_Cloud/private_key.pem'
+    var clientPublicKey = '../cloud-dashboard/Cloud-Page/Backend/RSA_Cloud/public_key.pem'
     await cryptoFunctions.keyDecryption(encKeyFilePath, decKeyFilePath, serverPrivateKey)
     await cryptoFunctions.decryptFile(encFilePath,decFileDirectory,decKeyFilePath,sigFilePath,clientPublicKey, 
         (fileVerify, decryptedFile) => {
