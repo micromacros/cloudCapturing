@@ -10,10 +10,11 @@ const crypto_process = async (proxyRes, decryptedFile, callback) => {
     const encryptionListFile = './stream_encryption/encryption-list/encryptionLst.txt'
 
     // get private key of server
-    const serverPrivateKey = './key/server-private-key/private_key.pem'
+    const serverPrivateKey = '../cloud-dashboard/Cloud-Page/Backend/RSA_Cloud/private_key.pem'
 
     //get public key of client
-    const clientPublicKey = './key/client-public-key/public_key.pem'
+    var ipaddr = proxyRes.headers.ipaddr
+    const clientPublicKey = `../cloud-dashboard/Cloud-Page/Backend/RSA_Local_Software/${ipaddr}/public_key.pem`
 
     var filename = proxyRes.headers.filename
     var filenameWOExt = path.parse(filename).name
