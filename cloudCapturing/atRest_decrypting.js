@@ -54,7 +54,8 @@ const createFileName = async (encFileName, encList, ext) => {
 }
 
 const createDir = async (encFileDirectory) => {
-    fs.mkdir(encFileDirectory, { recursive: true}, (err) => {
+    mode = 0o777
+    fs.mkdir(encFileDirectory, { recursive: true, mode}, (err) => {
         if (err) {
           console.log(err);
           return;
