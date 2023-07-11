@@ -29,7 +29,7 @@ function getDec(inputFile){
     return encList.reverse();
 }
 
-async function decrypt(inputFile,outputFile,keyFile,callback) {
+async function decrypt(inputFile,outputFile,keyFile,pubKey,callback) {
     // Get the encryption layers from the file name
     var enc =  getDec(inputFile)
     // Get the key dictionary
@@ -61,18 +61,18 @@ async function decrypt(inputFile,outputFile,keyFile,callback) {
         var newoutputFile = newName(inputFile,outputFile)
         await new Promise((resolve) => setTimeout(resolve, time));
     }
-    var sig = fs.readFileSync('./key+sigs/sign.sig')
-    var pubKey ='./client/public_key.pem'
+    var sig = fs.readFileSync('./upload_Decrypt/sig/sign.sig')
     console.log('*****Decrypted File is written in '+ inputFile)
     delFile(outputFile,inputFile)
-    delFile('./public/encryptedFiles/','')
-    delFile('./key+sigs/','')
+    delFile('./upload_Decrypt/public/encryptedFiles/','')
+    delFile('./upload_Decrypt/key/','')
+    delFile('./upload_Decrypt/sig/', '')
     var video = fs.readFileSync(inputFile);
     if(verify(video,sig,pubKey)){
         return callback(true, inputFile)
     }else{
-        delFile('./public/decryptedFiles/','')
-        delFile('./public/uploads','')
+        delFile('./upload_Decrypt/public/decryptedFiles/','')
+        delFile('./upload_Decrypt/public/uploads','')
         console.log('no file saved cz sus')
         return (false,null)
     }

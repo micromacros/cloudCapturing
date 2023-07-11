@@ -14,16 +14,18 @@ var rsaenc = require('./upload_Decrypt/rsaenc.js')
 const decrypt = require('./upload_Decrypt/decrypt.js');
 const verify = require('./upload_Decrypt/verify.js');
 const delFile = require('./upload_Decrypt/delFile.js');
+const bodyParser = require('body-parser');	
 var multer = require('multer')
 
 const app = express();
+app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
 let storage = multer.diskStorage({
 	destination: function (req, file, callback) {
 		console.log(file)
-		callback(null,"./public/encryptedFiles")
+		callback(null,"./upload_Decrypt/public/encryptedFiles")
 	},
 	filename: function (req, file, cb) {
 		req.filename = file.originalname
@@ -196,7 +198,7 @@ app.post('/getVideo',upload.single('file'), function(req,res) {
     var file = path+files[0];
     var inputFile = file
     var outputFile = './upload_Decrypt/public/decryptedFiles/'
-    decrypt(inputFile,outputFile,keyDic, async (verify, decryptedFile) => {
+    decrypt(inputFile,outputFile,keyDic,pubKey, async (verify, decryptedFile) => {
       if (verify) {
           console.log('decryption completed')
           console.log('File Decrypted Successfully')
