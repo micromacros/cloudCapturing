@@ -3,19 +3,19 @@ const decrypt = require('./decrypt.js');
 const verify = require('./verify.js');
 const delFile = require('./delFile.js')
 
-const upload_decrypt = function (body,callback){
-    var ipaddr = body.ip_addr
+const upload_decrypt = function (req,callback){
+    var ipaddr = req.body.ip_addr
     var pubKey = `../cloud-dashboard/Cloud-Page/Backend/RSA_Local_Software/${ipaddr}/public_key.pem`
     var privKey = '../cloud-dashboard/Cloud-Page/Backend/RSA_Cloud/private_key.pem'
-    var encKey = body.Key
+    var encKey = req.body.Key
     // decrypting key file
     key = rsaenc.decryptKey(encKey,privKey)
 
-    var keySig = body.Key_Signature
-	var signature = body.Signature
+    var keySig =req. body.Key_Signature
+	var signature = req.body.Signature
 	fs.writeFileSync('./upload_Decrypt/sig/sign.sig',signature)
-	var uploadFile = body.FileInformation
-	var uploadSig = body.Upload_Signature
+	var uploadFile = req.body.FileInformation
+	var uploadSig = req.body.Upload_Signature
 
     if (verify(key,keySig,pubKey) == true&&verify(uploadFile,uploadSig,pubKey)==true){
 		fs.writeFileSync('./upload_Decrypt/key/key.bin', key);

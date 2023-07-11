@@ -151,7 +151,7 @@ const listenResponse = async (proxyRes, req, res) => {
 };
 
 app.post('/getVideo', function(req,res) {
-  upload_decrypt(req.body, async (err, decryptedFile) => {
+  upload_decrypt(req, async (err, decryptedFile) => {
     if (err){
       console.log('Upload Failed')
       res.status(401).send('authfail')
