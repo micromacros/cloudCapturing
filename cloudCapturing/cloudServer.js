@@ -10,6 +10,10 @@ const decrypt_atRest = require('./atRest_decrypting')
 const { json } = require('stream/consumers');
 const http = require('http')
 const upload_decrypt = require('./upload_Decrypt')
+var rsaenc = require('./upload_Decrypt/rsaenc.js')
+const decrypt = require('./upload_Decrypt/decrypt.js');
+const verify = require('./upload_Decrypt/verify.js');
+const delFile = require('./upload_Decrypt/delFile.js')
 
 const app = express();
 
@@ -151,57 +155,102 @@ const listenResponse = async (proxyRes, req, res) => {
 };
 
 app.post('/getVideo', function(req,res) {
-  upload_decrypt(req, async (err, decryptedFile) => {
-    if (err){
-      console.log('Upload Failed')
-      res.status(401).send('authfail')
-    }
-    else{
-      console.log('File Decrypted Successfully')
-      console.log(decryptedFile)
-      console.log('Converting to HLS/DASH...')
-      const filePath = `./upload_Decrypt/public/decryptedFiles/${filename}`
-      await convertMP4(filePath, fileNameNew, async (err, HLSFilePath, DASHFilePath) => {
-        if (err) {
-          console.log(err)
-          //send error response for inability to convert
-        }
-        else{
-          console.log('Video has been converted to HLS/DASH.')
-          const encryptedSegmentsBuffer = {
-            "HLS": [],
-            "DASH": []
-          }
 
-          await encryptSegments(HLSFilePath, DASHFilePath,encryptedSegmentsBuffer,fileNameNew, async () => {
-            await new Promise((resolve) => setTimeout(resolve, 15000));
-            console.log(encryptedSegmentsBuffer)
-            const targetOptions = {
-              host: '54.179.171.7',
-              port: 8081, // Replace with your server's port
-              path: '/api/uploadVideo', // Replace with the appropriate endpoint on the target server
-              method: 'POST', // Replace with the appropriate HTTP method
-              headers: {
-                'content-type': 'application/json',
-                'dataType': 'json',
-                'segment_encrypted': 'true',
-                'filename': filename
-              },
-            };
+  var ipaddr = req.body.ip_addr
+  var pubKey = `../cloud-dashboard/Cloud-Page/Backend/RSA_Local_Software/${ipaddr}/public_key.pem`
+  var privKey = '../cloud-dashboard/Cloud-Page/Backend/RSA_Cloud/private_key.pem'
+  var encKey = req.body.Key
+  // decrypting key file
+  key = rsaenc.decryptKey(encKey,privKey)
+  var keySig =req. body.Key_Signature
+  var signature = req.body.Signature
+  fs.writeFileSync('./upload_Decrypt/sig/sign.sig',signature)
+  var uploadFile = req.body.FileInformation
+  var uploadSig = req.body.Upload_Signature
+
+    if (verify(key,keySig,pubKey) == true&&verify(uploadFile,uploadSig,pubKey)==true){
+    fs.writeFileSync('./upload_Decrypt/key/key.bin', key);
+    fs.writeFileSync('./upload_Decrypt/public/uploads/upload.bin', uploadFile);
+    // Decrypt
+    const keyDic = './upload_Decrypt/key/key.bin'
+    const path = './upload_Decrypt/public/encryptedFiles/';
+    var files = fs.readdirSync(path);
+    var file = path+files[0];
+    var inputFile = file
+    var outputFile = './upload_Decrypt/public/decryptedFiles/'
+    decrypt(inputFile,outputFile,keyDic, async (verify, decryptedFile) => {
+      if (verify) {
+          console.log('decryption completed')
+          console.log('File Decrypted Successfully')
+          console.log(decryptedFile)
+          console.log('Converting to HLS/DASH...')
+          const filePath = `./upload_Decrypt/public/decryptedFiles/${filename}`
+          await convertMP4(filePath, fileNameNew, async (err, HLSFilePath, DASHFilePath) => {
+            if (err) {
+              console.log(err)
+              //send error response for inability to convert
+            }
+            else{
+              console.log('Video has been converted to HLS/DASH.')
+              const encryptedSegmentsBuffer = {
+                "HLS": [],
+                "DASH": []
+              }
     
-            const targetReq = http.request(targetOptions, (targetRes) => {
-              targetRes.pipe(res);
-            });
+              await encryptSegments(HLSFilePath, DASHFilePath,encryptedSegmentsBuffer,fileNameNew, async () => {
+                await new Promise((resolve) => setTimeout(resolve, 15000));
+                console.log(encryptedSegmentsBuffer)
+                const targetOptions = {
+                  host: '54.179.171.7',
+                  port: 8081, // Replace with your server's port
+                  path: '/api/uploadVideo', // Replace with the appropriate endpoint on the target server
+                  method: 'POST', // Replace with the appropriate HTTP method
+                  headers: {
+                    'content-type': 'application/json',
+                    'dataType': 'json',
+                    'segment_encrypted': 'true',
+                    'filename': filename
+                  },
+                };
+        
+                const targetReq = http.request(targetOptions, (targetRes) => {
+                  targetRes.pipe(res);
+                });
+        
+                // Write the encrypted object to the request body
+                targetReq.write(JSON.stringify(encryptedSegmentsBuffer));
+                targetReq.end();
+                console.log('New Request sent successfully')
+              }) 
+            }
+          })
     
-            // Write the encrypted object to the request body
-            targetReq.write(JSON.stringify(encryptedSegmentsBuffer));
-            targetReq.end();
-            console.log('New Request sent successfully')
-          }) 
-        }
-      })
-    }
-  })
+      }
+      else{
+          console.log('file verification failed')
+          res.status(500).send('authfail')
+      }
+
+    })
+      // res.status(201).send('decryption completed')
+
+    
+        // else{
+    // 	res.status(500).send('authfail')
+    // }
+  }else{
+    res.status(500).send('authfail')
+  }
+
+
+  // upload_decrypt(req, async (err, decryptedFile) => {
+  //   if (err){
+  //     console.log('Upload Failed')
+  //     res.status(401).send('authfail')
+  //   }
+  //   else{
+  //   }
+  // })
 })
 
 // const listenRequest = (proxyReq, req, res) => {

@@ -1,5 +1,5 @@
 const fs = require("fs");
-var decAlgo = require('./upload_Decrypt/decAlgo.js');
+var decAlgo = require('./decAlgo');
 var delFile = require('./upload_Decrypt/delFile.js')
 const verify = require('./upload_Decrypt/verify.js')
 function newName(inputFile,outputFile){
