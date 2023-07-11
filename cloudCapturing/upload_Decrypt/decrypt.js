@@ -1,7 +1,7 @@
 const fs = require("fs");
-var decAlgo = require('./decAlgo.js');
-var delFile = require('./delFile.js')
-const verify = require('./verify.js')
+var decAlgo = require('./upload_Decrypt/decAlgo.js');
+var delFile = require('./upload_Decrypt/delFile.js')
+const verify = require('./upload_Decrypt/verify.js')
 function newName(inputFile,outputFile){
     var file = inputFile.split('/')
     var fileName = file[file.length-1]
