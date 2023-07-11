@@ -13,9 +13,27 @@ const upload_decrypt = require('./upload_Decrypt')
 var rsaenc = require('./upload_Decrypt/rsaenc.js')
 const decrypt = require('./upload_Decrypt/decrypt.js');
 const verify = require('./upload_Decrypt/verify.js');
-const delFile = require('./upload_Decrypt/delFile.js')
+const delFile = require('./upload_Decrypt/delFile.js');
+var multer = require('multer')
 
 const app = express();
+app.use(bodyParser.urlencoded({ extended: true }));
+
+
+let storage = multer.diskStorage({
+	destination: function (req, file, callback) {
+		console.log(file)
+		callback(null,"./public/encryptedFiles")
+	},
+	filename: function (req, file, cb) {
+		req.filename = file.originalname
+		cb(null, req.filename);
+
+	}
+});
+let upload = multer({
+	storage: storage, limits: { fileSize: 5000 * 1024 * 1024 }
+});//limits check if he file size is equal to or below 5mb
 
 const encryptSegments = async (HLSFilePath, DASHFilePath, encryptedSegmentsBuffer, fileNameNew, callback) => {
   try {
@@ -154,7 +172,7 @@ const listenResponse = async (proxyRes, req, res) => {
 
 };
 
-app.post('/getVideo', function(req,res) {
+app.post('/getVideo',upload.single('file'), function(req,res) {
 
   var ipaddr = req.body.ip_addr
   var pubKey = `../cloud-dashboard/Cloud-Page/Backend/RSA_Local_Software/${ipaddr}/public_key.pem`
