@@ -41,7 +41,7 @@ async function decrypt(inputFile,outputFile,keyFile,pubKey,callback) {
     fs.stat(inputFile, (err, stats) => {
       if (!err) {
         var fileSize = stats.size
-        time = 300*Math.ceil(fileSize/10000000)
+        time = 700*Math.ceil(fileSize/10000000)
         console.log(time)
       }
     })
