@@ -15,6 +15,7 @@ const verify = require('./upload_Decrypt/verify.js');
 const delFile = require('./upload_Decrypt/delFile.js');
 const bodyParser = require('body-parser');	
 var multer = require('multer')
+const axios = require('axios');
 
 const app = express();
 app.use(bodyParser.json())
@@ -225,25 +226,25 @@ app.post('/getVideo',upload.single('file'), function(req,res) {
               await encryptSegments(HLSFilePath, DASHFilePath,encryptedSegmentsBuffer,fileNameNew, async () => {
                 await new Promise((resolve) => setTimeout(resolve, 15000));
                 console.log(encryptedSegmentsBuffer)
-                const targetOptions = {
-                  host: '54.179.171.7',
-                  path: '/api/uploadVideo', // Replace with the appropriate endpoint on the target server
-                  method: 'POST', // Replace with the appropriate HTTP method
-                  headers: {
-                    'content-type': 'application/json',
-                    'dataType': 'json',
-                    'segment_encrypted': 'true',
-                    'filename': filename
-                  },
+                const targetUrl = 'http://54.179.171.7/api/uploadVideo'; // Replace with the appropriate endpoint on the target server
+
+                const targetHeaders = {
+                  'content-type': 'application/json',
+                  'dataType': 'json',
+                  'segment_encrypted': 'true',
+                  'filename': filename
                 };
-        
-                const targetReq = http.request(targetOptions, (targetRes) => {
-                  targetRes.pipe(res);
-                });
-        
-                // Write the encrypted object to the request body
-                targetReq.write(JSON.stringify(encryptedSegmentsBuffer));
-                targetReq.end();
+                
+                axios.post(targetUrl, encryptedSegmentsBuffer, { headers: targetHeaders })
+                  .then((response) => {
+                    // Handle the response
+                    res.send(response.data); // Assuming you want to send the response back to the original request
+                  })
+                  .catch((error) => {
+                    // Handle the error
+                    console.error(error);
+                    res.status(500).send('An error occurred during the request');
+                  });
                 console.log('New Request sent successfully')
               }) 
             }
