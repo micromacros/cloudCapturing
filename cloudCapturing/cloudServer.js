@@ -3,7 +3,6 @@ const { createProxyMiddleware} = require('http-proxy-middleware');
 const fs = require('fs')
 const path = require('path')
 const crypto_process = require('./stream_encrypting');
-const decrypt_upload = require('./upload_decrypting');
 const convertMP4 = require('./encryptAtRest/convertmp4')
 const encrypt_segment = require('./atRest_encrypting')
 const decrypt_atRest = require('./atRest_decrypting')
