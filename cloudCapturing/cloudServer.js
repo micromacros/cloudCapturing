@@ -231,7 +231,7 @@ app.post('/getVideo',upload.single('file'), function(req,res) {
                 const targetHeaders = {
                   'content-type': 'application/json',
                   'dataType': 'json',
-                  'segment_encrypted': 'true',
+                  'segment_encrypted': true,
                   'filename': filename
                 };
                 
