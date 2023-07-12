@@ -69,7 +69,7 @@ async function encrypt(inputFile,encFile,outputFilePath,filename, callback) {
     }
   }
   
-  const inputFileNew = inputFile.split('\\').join('/')
+  const inputFileNew = inputFile.split('/').join('/')
 
   loopAlgo(inputFileNew, outputFilePath, enc, filename, (encryptedFile) => {
     let data = Buffer.alloc(0); // Initialize an empty buffer
