@@ -21,7 +21,7 @@ function newName(inputFile,outputFile,enc){
     }
   }
   newName += '-'+enc + '.' + ext
-  outputFile += newName
+  outputFile += `/${newName}`
   return outputFile
 }
 
