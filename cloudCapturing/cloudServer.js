@@ -46,7 +46,7 @@ const encryptSegments = async (HLSFilePath, DASHFilePath, encryptedSegmentsBuffe
     for(const file of hlsFiles){
       const filePath = path.join(HLSFilePath, file);
       console.log(filePath);
-      const filenameList = filePath.split('\\');
+      const filenameList = filePath.split('/');
       console.log(filenameList);
       const filename = filenameList[filenameList.length - 1];
 
@@ -65,7 +65,7 @@ const encryptSegments = async (HLSFilePath, DASHFilePath, encryptedSegmentsBuffe
     for (const file of dashFiles) {
       const filePath = path.join(DASHFilePath, file);
       console.log(filePath);
-      const filenameList = filePath.split('\\');
+      const filenameList = filePath.split('/');
       console.log(filenameList);
       const filename = filenameList[filenameList.length - 1];
 
