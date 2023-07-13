@@ -75,10 +75,6 @@ const encryptSegments = async (HLSFilePath, DASHFilePath, fileNameNew, callback)
               console.error(error);
               return callback(error, null)
             });
-    
-
-
-
           // encryptedSegmentsBuffer.HLS.push({ [filename]: encryptedBuffer });
         });
       }
@@ -272,8 +268,9 @@ app.post('/getVideo',upload.single('file'), function(req,res) {
                 res.status(500).send('An error occurred during upload');
               }
               else{
-                res.status(200).send('Upload Complete')
                 await new Promise((resolve) => setTimeout(resolve, 10000));
+                res.status(200).send('Upload Complete')
+
                 fs.rmSync(HLSFilePath, { recursive: true, force: true });
                 fs.rmSync(DASHFilePath, { recursive: true, force: true });
               }
