@@ -53,12 +53,12 @@ const createFileName = async (encFileName, encList, ext) => {
 
 }
 
-const createDir = async (encFileDirectory) => {
+const createDir = async (encFileDirectory, callback) => {
     mode = 0o777
     fs.mkdir(encFileDirectory, { recursive: true, mode}, (err) => {
         if (err) {
           console.log(err);
-          return;
+          return callback();
         }
     })
 }
@@ -80,9 +80,13 @@ const decrypt_process = async (proxyRes, sigFile, encKeyFile,atRestList, callbac
     var encFileNameFinal = await createFileName(encFileName, encList, ext)
 
     var encFileDirectory = `./decryptAtRest/public/encryptedFiles/${filenameWOExt}/`
-    await createDir(encFileDirectory)
     var decFileDirectory = `./decryptAtRest/public/decryptedFile/`
-    await createDir(decFileDirectory)
+    await createDir(encFileDirectory, async () => {
+        await createDir(decFileDirectory, async () => {
+            console.log('encrypted file path created...')
+        })
+     
+    })
     var encFilePath = encFileDirectory+encFileNameFinal
 
     var sigFilePath = sigFile
