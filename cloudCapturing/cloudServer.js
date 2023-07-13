@@ -37,7 +37,7 @@ let upload = multer({
 	storage: storage, limits: { fileSize: 5000 * 1024 * 1024 }
 });//limits check if he file size is equal to or below 5mb
 
-const encryptSegments = async (HLSFilePath, DASHFilePath, encryptedSegmentsBuffer, fileNameNew, callback) => {
+const encryptSegments = async (HLSFilePath, DASHFilePath, fileNameNew, callback) => {
   try {
     const [hlsFiles, dashFiles] = await Promise.all([
       readDirectory(HLSFilePath),
@@ -46,34 +46,69 @@ const encryptSegments = async (HLSFilePath, DASHFilePath, encryptedSegmentsBuffe
 
     for(const file of hlsFiles){
       const filePath = path.join(HLSFilePath, file);
-      console.log(filePath);
       const filenameList = filePath.split('/');
-      console.log(filenameList);
       const filename = filenameList[filenameList.length - 1];
-
+      // const ext = path.extname(filename)
       if (fs.statSync(filePath).isFile()) {
         const encryptFileAtRestPath = `./encryptAtRest/HLSEncrypted/${fileNameNew}`;
         await encrypt_segment(filePath, encryptFileAtRestPath, file, (encryptedBuffer) => {
-          encryptedSegmentsBuffer.HLS.push({ [filename]: encryptedBuffer });
+          const targetHeaders = {
+            'content-type': 'application/json',
+            'dataType': 'buffer',
+            'filename': filename,
+            'type': 'HLS'
+          };
+          const targetUrl = 'http://54.179.171.7/api/uploadVideo'; // Replace with the appropriate endpoint on the target server
+          axios.post(targetUrl, encryptedBuffer, { headers: targetHeaders })
+            .then((response) => {
+              // Handle the response
+              console.log(`response status: ${response.status}`)
+              console.log('Segment is uploaded'); // Assuming you want to send the response back to the original request
+            })
+            .catch((error) => {
+              // Handle the error
+              console.log(`response status: ${error.response.status}`)
+              console.error(error);
+              res.status(500).send('An error occurred during upload');
+            });
+    
+
+
+
+          // encryptedSegmentsBuffer.HLS.push({ [filename]: encryptedBuffer });
         });
       }
     }
 
-    // await Promise.all(hlsFiles.map(async (file) => {
-
-    // }))
-
     for (const file of dashFiles) {
       const filePath = path.join(DASHFilePath, file);
-      console.log(filePath);
       const filenameList = filePath.split('/');
-      console.log(filenameList);
       const filename = filenameList[filenameList.length - 1];
-
+      // const ext = path.extname(filename)
       if (fs.statSync(filePath).isFile()) {
         const encryptFileAtRestPath = `./encryptAtRest/DASHEncrypted/${fileNameNew}`;
         await encrypt_segment(filePath, encryptFileAtRestPath, file, (encryptedBuffer) => {
-          encryptedSegmentsBuffer.DASH.push({ [filename]: encryptedBuffer });
+          const targetHeaders = {
+            'content-type': 'application/json',
+            'dataType': 'buffer',
+            'filename': filename,
+            'file-type': 'DASH'
+          };
+          const targetUrl = 'http://54.179.171.7/api/uploadVideo'; // Replace with the appropriate endpoint on the target server
+          axios.post(targetUrl, encryptedBuffer, { headers: targetHeaders })
+            .then((response) => {
+              // Handle the response
+              console.log(`response status: ${response.status}`)
+              console.log('Segment is uploaded'); // Assuming you want to send the response back to the original request
+            })
+            .catch((error) => {
+              // Handle the error
+              console.log(`response status: ${error.response.status}`)
+              console.error(error);
+              res.status(500).send('An error occurred during upload');
+            });
+
+          // encryptedSegmentsBuffer.DASH.push({ [filename]: encryptedBuffer });
         });
       }
     }
@@ -82,6 +117,8 @@ const encryptSegments = async (HLSFilePath, DASHFilePath, encryptedSegmentsBuffe
     // }))
 
     return callback()
+    
+
     
     // Call the callback or perform other operations here after both readdir operations are completed
 
@@ -182,13 +219,12 @@ app.post('/getVideo',upload.single('file'), function(req,res) {
   var encKey = req.body.Key
   // decrypting key file
   key = rsaenc.decryptKey(encKey,privKey)
-  var keySig =req. body.Key_Signature
+  var keySig =req.body.Key_Signature
   var signature = req.body.Signature
   fs.writeFileSync('./upload_Decrypt/sig/sign.sig',signature)
   var uploadFile = req.body.FileInformation
   var uploadSig = req.body.Upload_Signature
-
-    if (verify(key,keySig,pubKey) == true&&verify(uploadFile,uploadSig,pubKey)==true){
+  if (verify(key,keySig,pubKey) == true&&verify(uploadFile,uploadSig,pubKey)==true){
     fs.writeFileSync('./upload_Decrypt/key/key.bin', key);
     fs.writeFileSync('./upload_Decrypt/public/uploads/upload.bin', uploadFile);
     // Decrypt
@@ -200,62 +236,42 @@ app.post('/getVideo',upload.single('file'), function(req,res) {
     var outputFile = './upload_Decrypt/public/decryptedFiles/'
     decrypt(inputFile,outputFile,keyDic,pubKey, async (verify, decryptedFile) => {
       if (verify) {
-          console.log('decryption completed')
-          console.log('File Decrypted Successfully')
-          console.log(decryptedFile)
-          console.log('Converting to HLS/DASH...')
-          var filenameList = decryptedFile.split('/')
-          var filename = filenameList[filenameList.length-1]
-          console.log(filename)
-          var filenameWOExt = path.parse(filename).name
-          var ext = path.extname(filename)
-          var fileNameNew = filenameWOExt.split(' ').join('-');
-          // const filePath = `./upload_Decrypt/public/decryptedFiles/${filename}`
-          await convertMP4(decryptedFile, fileNameNew, async (err, HLSFilePath, DASHFilePath) => {
-            if (err) {
-              console.log(err)
-              //send error response for inability to convert
-            }
-            else{
-              console.log('Video has been converted to HLS/DASH.')
-              const encryptedSegmentsBuffer = {
-                "HLS": [],
-                "DASH": []
-              }
-    
-              await encryptSegments(HLSFilePath, DASHFilePath,encryptedSegmentsBuffer,fileNameNew, async () => {
-                await new Promise((resolve) => setTimeout(resolve, 15000));
-                console.log(encryptedSegmentsBuffer)
-                const targetUrl = 'http://54.179.171.7/api/uploadVideo'; // Replace with the appropriate endpoint on the target server
-
-                const targetHeaders = {
-                  'content-type': 'application/json',
-                  'dataType': 'json',
-                  segment_encrypted: true,
-                  'filename': filename
-                };
-                
-                axios.post(targetUrl, encryptedSegmentsBuffer, { headers: targetHeaders })
-                  .then((response) => {
-                    // Handle the response
-                    res.send(response.data); // Assuming you want to send the response back to the original request
-                  })
-                  .catch((error) => {
-                    // Handle the error
-                    console.error(error);
-                    res.status(500).send('An error occurred during the request');
-                  });
-                console.log('New Request sent successfully')
-              }) 
-            }
-          })
-    
+        console.log('decryption completed')
+        console.log('File Decrypted Successfully')
+        console.log(decryptedFile)
+        console.log('Converting to HLS/DASH...')
+        var filenameList = decryptedFile.split('/')
+        var filename = filenameList[filenameList.length-1]
+        console.log(filename)
+        var filenameWOExt = path.parse(filename).name
+        var ext = path.extname(filename)
+        var fileNameNew = filenameWOExt.split(' ').join('-');
+        // const filePath = `./upload_Decrypt/public/decryptedFiles/${filename}`
+        await convertMP4(decryptedFile, fileNameNew, async (err, HLSFilePath, DASHFilePath) => {
+          if (err) {
+            console.log(err)
+            res.status(500).send()
+            //send error response for inability to convert
+          }
+          else{
+            console.log('Video has been converted to HLS/DASH.')
+            // const uploadInfo = JSON.parse(fs.readFileSync('./upload_Decrypt/public/uploads/upload.bin'))
+            // const title = uploadInfo.title
+  
+            await encryptSegments(HLSFilePath, DASHFilePath,fileNameNew, async () => {
+              
+              res.status(200).send('Upload Complete')
+              await new Promise((resolve) => setTimeout(resolve, 10000));
+              fs.rmSync(HLSFilePath, { recursive: true, force: true });
+              fs.rmSync(DASHFilePath, { recursive: true, force: true });
+            }) 
+          }
+        })
       }
       else{
-          console.log('file verification failed')
-          res.status(500).send('authfail')
+        console.log('file verification failed')
+        res.status(500).send('authfail')
       }
-
     })
 
   }else{
