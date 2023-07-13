@@ -8,6 +8,7 @@ var delFile = require('./delFile.js')
 
 function newName(inputFile,outputFile,enc){
   // inputFile.split('\\').join('/')
+  console.log(inputFile)
   var file = inputFile.split('/')
   var fileName = file[file.length-1]
   var filenameLst = fileName.split('.')
@@ -20,6 +21,7 @@ function newName(inputFile,outputFile,enc){
       newName += filenameLst[i]
     }
   }
+  console.log(outputFile)
   newName += '-'+enc + '.' + ext
   outputFile += `/${newName}`
   return outputFile
@@ -37,7 +39,7 @@ const loopAlgo = async function (filePath, outputFilePath, enc, filename, callba
     await encAlgo[enc[i]].encrypt(inputFile, newoutputFile, filename, '');
     var inputFile = newName(inputFile,outputFilePath,enc[i])
     var newoutputFile = newName(inputFile,outputFilePath,enc[i+1])
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1300));
   }
 
   return callback(inputFile)

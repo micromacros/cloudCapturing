@@ -55,7 +55,7 @@ async function decrypt(inputFile,outputFile,keyFile,pubKey,callback) {
         }else{
             // The other keys are stored as Buffer but in plain text, need to change it back to buffer
             var key = Buffer.from(keyDic[enc[i]].data)
-            console.log(key)
+	    console.log(key)
         }
         decAlgo[enc[i]].decrypt(inputFile, newoutputFile, key);
         var inputFile = newName(inputFile,outputFile)
