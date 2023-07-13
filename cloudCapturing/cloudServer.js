@@ -54,12 +54,16 @@ const encryptSegments = async (HLSFilePath, DASHFilePath, fileNameNew, callback)
         await encrypt_segment(filePath, encryptFileAtRestPath, file, (encryptedBuffer) => {
           const targetHeaders = {
             'content-type': 'application/json',
-            'dataType': 'buffer',
-            'filename': filename,
+            'dataType': 'json',
+            'filename': fileNameNew,
+            'segmentname':filename,
             'type': 'HLS'
           };
+          const encryptedFileObject = {
+            "fileData": encryptedBuffer
+          } 
           const targetUrl = 'http://54.179.171.7/api/uploadVideo'; // Replace with the appropriate endpoint on the target server
-          axios.post(targetUrl, encryptedBuffer, { headers: targetHeaders })
+          axios.post(targetUrl, encryptedFileObject, { headers: targetHeaders })
             .then((response) => {
               // Handle the response
               console.log(`response status: ${response.status}`)
@@ -90,12 +94,16 @@ const encryptSegments = async (HLSFilePath, DASHFilePath, fileNameNew, callback)
         await encrypt_segment(filePath, encryptFileAtRestPath, file, (encryptedBuffer) => {
           const targetHeaders = {
             'content-type': 'application/json',
-            'dataType': 'buffer',
-            'filename': filename,
-            'file-type': 'DASH'
+            'dataType': 'json',
+            'filename': fileNameNew,
+            'segmentname':filename,
+            'type': 'HLS'
           };
+          const encryptedFileObject = {
+            "fileData": encryptedBuffer
+          } 
           const targetUrl = 'http://54.179.171.7/api/uploadVideo'; // Replace with the appropriate endpoint on the target server
-          axios.post(targetUrl, encryptedBuffer, { headers: targetHeaders })
+          axios.post(targetUrl, encryptedFileObject, { headers: targetHeaders })
             .then((response) => {
               // Handle the response
               console.log(`response status: ${response.status}`)
