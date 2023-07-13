@@ -69,7 +69,7 @@ const encryptSegments = async (HLSFilePath, DASHFilePath, fileNameNew, callback)
               // Handle the error
               console.log(`response status: ${error.response.status}`)
               console.error(error);
-              res.status(500).send('An error occurred during upload');
+              return callback(error, null)
             });
     
 
@@ -105,7 +105,7 @@ const encryptSegments = async (HLSFilePath, DASHFilePath, fileNameNew, callback)
               // Handle the error
               console.log(`response status: ${error.response.status}`)
               console.error(error);
-              res.status(500).send('An error occurred during upload');
+              return callback(error, null)
             });
 
           // encryptedSegmentsBuffer.DASH.push({ [filename]: encryptedBuffer });
@@ -116,7 +116,7 @@ const encryptSegments = async (HLSFilePath, DASHFilePath, fileNameNew, callback)
     // await Promise.all(dashFiles.map(async (file) => {
     // }))
 
-    return callback()
+    return callback(null, null)
     
 
     
@@ -258,12 +258,18 @@ app.post('/getVideo',upload.single('file'), function(req,res) {
             // const uploadInfo = JSON.parse(fs.readFileSync('./upload_Decrypt/public/uploads/upload.bin'))
             // const title = uploadInfo.title
   
-            await encryptSegments(HLSFilePath, DASHFilePath,fileNameNew, async () => {
+            await encryptSegments(HLSFilePath, DASHFilePath,fileNameNew, async (err, complete) => {
+              if (err){
+                console.log(err)
+                res.status(500).send('An error occurred during upload');
+              }
+              else{
+                res.status(200).send('Upload Complete')
+                await new Promise((resolve) => setTimeout(resolve, 10000));
+                fs.rmSync(HLSFilePath, { recursive: true, force: true });
+                fs.rmSync(DASHFilePath, { recursive: true, force: true });
+              }
               
-              res.status(200).send('Upload Complete')
-              await new Promise((resolve) => setTimeout(resolve, 10000));
-              fs.rmSync(HLSFilePath, { recursive: true, force: true });
-              fs.rmSync(DASHFilePath, { recursive: true, force: true });
             }) 
           }
         })
