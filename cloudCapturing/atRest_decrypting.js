@@ -73,7 +73,6 @@ const decrypt_process = async (proxyRes, sigFile, encKeyFile,atRestList, callbac
     var encKeyFilePath = encKeyFile 
 
     const enc = JSON.parse(fs.readFileSync(encKeyFilePath))
-    console.log(enc)
     const encList = Object.keys(enc)
     var encFileName = ''
     encFileName += filenameWOExt
@@ -84,32 +83,34 @@ const decrypt_process = async (proxyRes, sigFile, encKeyFile,atRestList, callbac
     await createDir(encFileDirectory, async () => {
         await createDir(decFileDirectory, async () => {
             console.log('encrypted file path created...')
+            var encFilePath = encFileDirectory+encFileNameFinal
+
+            var sigFilePath = sigFile
+        
+            await writeToFile(proxyRes, encFilePath)   
+            console.log('Encrypted File Written')
+        
+            var decKeyFilePath = './key/uploadKeyFile/key.bin'
+            var serverPrivateKey = '../cloud-dashboard/Cloud-Page/Backend/RSA_Cloud/private_key.pem'
+            var clientPublicKey = '../cloud-dashboard/Cloud-Page/Backend/RSA_Cloud/public_key.pem'
+            await cryptoFunctions.keyDecryption(encKeyFilePath, decKeyFilePath, serverPrivateKey)
+            await cryptoFunctions.decryptFile(encFilePath,decFileDirectory,decKeyFilePath,sigFilePath,clientPublicKey, 
+                (fileVerify, decryptedFile) => {
+                    if (fileVerify){
+                        console.log('File Verification pass!')
+                        delDirectory(encFileDirectory)
+                        return callback(null, decryptedFile)
+                    }
+                    else{
+                        console.log('File Verification Failed')
+                        return callback(401, null)
+                    }
+                }
+            )
         })
      
     })
-    var encFilePath = encFileDirectory+encFileNameFinal
 
-    var sigFilePath = sigFile
-
-    await writeToFile(proxyRes, encFilePath)   
-    console.log('Encrypted File Written')
-
-    var decKeyFilePath = './key/uploadKeyFile/key.bin'
-    var serverPrivateKey = '../cloud-dashboard/Cloud-Page/Backend/RSA_Cloud/private_key.pem'
-    var clientPublicKey = '../cloud-dashboard/Cloud-Page/Backend/RSA_Cloud/public_key.pem'
-    await cryptoFunctions.keyDecryption(encKeyFilePath, decKeyFilePath, serverPrivateKey)
-    await cryptoFunctions.decryptFile(encFilePath,decFileDirectory,decKeyFilePath,sigFilePath,clientPublicKey, 
-        (fileVerify, decryptedFile) => {
-            if (fileVerify){
-                console.log('File Verification pass!')
-                delDirectory(encFileDirectory)
-                return callback(null, decryptedFile)
-            }
-            else{
-                console.log('File Verification Failed')
-                return callback(401, null)
-            }
-        })
 
         
     
