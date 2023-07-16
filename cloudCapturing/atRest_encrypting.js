@@ -4,31 +4,6 @@ const path = require('path')
 var delFile = require('./encryptAtRest/model/delFile')
 
 
-const readFileStream = async (filePath) => {
-    // Create a readable stream from the file
-    const fileStream = fs.createReadStream(filePath);
-
-    // Handle events emitted by the stream
-    fileStream.on('data', (chunk) => {
-        // Process each chunk of data
-        console.log(`Received ${chunk.length} bytes`);
-    });
-    
-    fileStream.on('end', () => {
-        // File reading is complete
-        console.log('File reading complete');
-        return fileStream
-    });
-    
-    fileStream.on('error', (error) => {
-        // Handle any errors that occur during file reading
-        console.error('An error occurred:', error);
-    });
-  
-}
-
-
-
 
 const crypto_process = async (segmentPath, outputFilePath, filename, callback) => {
     var filenameWOExt = path.parse(filename).name
@@ -64,8 +39,6 @@ const crypto_process = async (segmentPath, outputFilePath, filename, callback) =
                         console.log(err)
                     }
                     else{
-                            
-                        // console.log('\n\nencrypted buffer\n\n', encryptedBuffer, '\n\n') 
                         
                         // encrypt keyFile with RSA
                         console.log('Encrypting Key File...')
@@ -77,41 +50,6 @@ const crypto_process = async (segmentPath, outputFilePath, filename, callback) =
                             fs.rmSync(unencryptedKeyFile)
                             return callback(encryptedBuffer);
                         })
-                        // const encryptedKeyFile = fs.readFileSync(encryptedKeyFilePath)
-                        
-                        // const encryptedKeyFileBuffer = Buffer.from(encryptedKeyFile)
-                        // console.log("Key File Buffer: \n\n",encryptedKeyFileBuffer)
-
-                        
-
-
-                        // fs.readFile('./encryptAtRest/encryption-list/encryptionLst.txt', async (err, data) => {
-                        //     if (err) {
-                        //         console.log(err)
-                                
-                        //     }
-                        //     else{
-                        //         var encryption_list = data
-
-                        //         const encryptedObject = {
-                        //             // "signaturebuffer" : fileSigData,
-                        //             "encryptedbuffer": encryptedBuffer,
-                        //             // "encryptedkeyfilebuffer": encryptedKeyFileBuffer,
-                        //             // "encryptionlist": encryption_list
-                        //         }
-                        //         console.log(encryptedObject)
-
-
-                        //         // delFile(outputFilePath)
-                        //         // fs.unlinkSync(unencryptFilePath)
-                        //         // await new Promise((resolve) => setTimeout(resolve, 500));
-        
-                        //         }
-                        // })
-
-
-
-                        // console.log(encryptedObject)
 
             
                     }

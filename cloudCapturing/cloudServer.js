@@ -93,7 +93,7 @@ const encryptSegments = async (HLSFilePath, DASHFilePath, fileNameNew, callback)
             'dataType': 'json',
             'filename': fileNameNew,
             'segmentname':filename,
-            'type': 'HLS'
+            'type': 'DASH'
           };
           const encryptedFileObject = {
             "fileData": encryptedBuffer
@@ -117,14 +117,7 @@ const encryptSegments = async (HLSFilePath, DASHFilePath, fileNameNew, callback)
       }
     }
 
-    // await Promise.all(dashFiles.map(async (file) => {
-    // }))
-
     return callback(null, null)
-    
-
-    
-    // Call the callback or perform other operations here after both readdir operations are completed
 
   } catch (err) {
     console.error(err);
@@ -270,9 +263,15 @@ app.post('/getVideo',upload.single('file'), function(req,res) {
               else{
                 await new Promise((resolve) => setTimeout(resolve, 10000));
                 res.status(200).send('Upload Complete')
+                
+                const encryptFileAtRestHLS = `./encryptAtRest/HLSEncrypted/${fileNameNew}`;
+                const encryptFileAtRestDASH = `./encryptAtRest/DASHEncrypted/${fileNameNew}`;
 
                 fs.rmSync(HLSFilePath, { recursive: true, force: true });
                 fs.rmSync(DASHFilePath, { recursive: true, force: true });
+                fs.rmSync(encryptFileAtRestHLS, { recursive: true, force: true });
+                fs.rmSync(encryptFileAtRestHLS, { recursive: true, force: true });
+
               }
               
             }) 

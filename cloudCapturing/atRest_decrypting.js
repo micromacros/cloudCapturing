@@ -58,7 +58,9 @@ const createDir = async (encFileDirectory, callback) => {
     fs.mkdir(encFileDirectory, { recursive: true, mode}, (err) => {
         if (err) {
           console.log(err);
-          return callback();
+        }
+        else{
+            return callback();
         }
     })
 }
@@ -86,10 +88,10 @@ const decrypt_process = async (proxyRes, sigFile, encKeyFile,atRestList, callbac
             var encFilePath = encFileDirectory+encFileNameFinal
 
             var sigFilePath = sigFile
-        
-            await writeToFile(proxyRes, encFilePath)   
+
+            await writeToFile(proxyRes, encFilePath)
             console.log('Encrypted File Written')
-        
+
             var decKeyFilePath = './key/uploadKeyFile/key.bin'
             var serverPrivateKey = '../cloud-dashboard/Cloud-Page/Backend/RSA_Cloud/private_key.pem'
             var clientPublicKey = '../cloud-dashboard/Cloud-Page/Backend/RSA_Cloud/public_key.pem'
@@ -108,18 +110,8 @@ const decrypt_process = async (proxyRes, sigFile, encKeyFile,atRestList, callbac
                 }
             )
         })
-     
     })
 
 
-        
-    
-    //             }
-    //         })
-        
-    //     }
-    // })
-
 }
-
 module.exports = decrypt_process
