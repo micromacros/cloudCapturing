@@ -270,7 +270,7 @@ app.post('/getVideo',upload.single('file'), function(req,res) {
                 fs.rmSync(HLSFilePath, { recursive: true, force: true });
                 fs.rmSync(DASHFilePath, { recursive: true, force: true });
                 fs.rmSync(encryptFileAtRestHLS, { recursive: true, force: true });
-                fs.rmSync(encryptFileAtRestHLS, { recursive: true, force: true });
+                fs.rmSync(encryptFileAtRestDASH, { recursive: true, force: true });
 
               }
               
