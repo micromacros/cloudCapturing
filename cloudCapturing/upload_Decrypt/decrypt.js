@@ -7,13 +7,13 @@ function newName(inputFile,outputFile){
     var fileName = file[file.length-1]
     var filenameLst = fileName.split('.')
     var ext = filenameLst[filenameLst.length-1]
-    var encList = (filenameLst[0].split('-'))
+    var encList = (filenameLst[0].split('__'))
     var newName = ''
     for(var i=0;i<(encList.length-1);i++){
         if(i == 0 ){
             newName += encList[i]
         }else{
-            newName += '-'+ encList[i]
+            newName += '__'+ encList[i]
         }
     }
     newName += '.' + ext
@@ -24,7 +24,7 @@ function getDec(inputFile){
     var file = inputFile.split('/')
     var fileName = file[file.length-1]
     var filenameLst = fileName.split('.')
-    var encList = (filenameLst[0].split('-'))
+    var encList = (filenameLst[0].split('__'))
     encList.splice(0,1)
     return encList.reverse();
 }

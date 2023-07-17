@@ -62,7 +62,7 @@ const encryptSegments = async (HLSFilePath, DASHFilePath, fileNameNew, callback)
           const encryptedFileObject = {
             "fileData": encryptedBuffer
           } 
-          const targetUrl = 'http://54.179.171.7/api/uploadVideo'; // Replace with the appropriate endpoint on the target server
+          const targetUrl = 'https://streamerpro.xyz/api/uploadVideo'; // Replace with the appropriate endpoint on the target server
           axios.post(targetUrl, encryptedFileObject, { headers: targetHeaders })
             .then((response) => {
               // Handle the response
@@ -98,7 +98,7 @@ const encryptSegments = async (HLSFilePath, DASHFilePath, fileNameNew, callback)
           const encryptedFileObject = {
             "fileData": encryptedBuffer
           } 
-          const targetUrl = 'http://54.179.171.7/api/uploadVideo'; // Replace with the appropriate endpoint on the target server
+          const targetUrl = 'https://streamerpro.xyz/api/uploadVideo'; // Replace with the appropriate endpoint on the target server
           axios.post(targetUrl, encryptedFileObject, { headers: targetHeaders })
             .then((response) => {
               // Handle the response
