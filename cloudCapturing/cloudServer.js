@@ -44,80 +44,115 @@ const encryptSegments = async (HLSFilePath, DASHFilePath, fileNameNew, callback)
       readDirectory(DASHFilePath)
     ])
 
-    for(const file of hlsFiles){
-      const filePath = path.join(HLSFilePath, file);
-      const filenameList = filePath.split('/');
-      const filename = filenameList[filenameList.length - 1];
-      // const ext = path.extname(filename)
-      if (fs.statSync(filePath).isFile()) {
-        const encryptFileAtRestPath = `./encryptAtRest/HLSEncrypted/${fileNameNew}`;
-        await encrypt_segment(filePath, encryptFileAtRestPath, file, (encryptedBuffer) => {
-          const targetHeaders = {
-            'content-type': 'application/json',
-            'dataType': 'json',
-            'filename': fileNameNew,
-            'segmentname':filename,
-            'type': 'HLS'
-          };
-          const encryptedFileObject = {
-            "fileData": encryptedBuffer
-          } 
-          const targetUrl = 'https://streamerpro.xyz/api/uploadVideo'; // Replace with the appropriate endpoint on the target server
-          axios.post(targetUrl, encryptedFileObject, { headers: targetHeaders })
-            .then((response) => {
-              // Handle the response
-              console.log(`response status: ${response.status}`)
-              console.log('Segment is uploaded'); // Assuming you want to send the response back to the original request
-            })
-            .catch((error) => {
-              // Handle the error
-              console.log(`response status: ${error.response.status}`)
-              console.error(error);
-              return callback(error, null)
-            });
-          // encryptedSegmentsBuffer.HLS.push({ [filename]: encryptedBuffer });
-        });
+    axios.get('https://creamsecurity.cloud/api/encryption-list/AR')
+    .then(response => {
+      // Handle the response data
+      const data = response.data
+      console.log(data);
+      const dataList = data.split(',')
+      var newData = ''
+      for (i = 0; i <dataList.length; i++){
+        if (dataList[i] == 'AES-256'){
+          newData += 'aes'
+        }
+        if (dataList[i] == 'Triple-DES'){
+          newData += "des"
+        }
+        if (dataList[i] == 'ChaCha20'){
+          newData += "cha"
+        }
+        if (dataList[i] == 'Blowfish'){
+          newData += "bfe"
+        }
+        if (i != dataList.length-1){
+          newData += ','
+        }
       }
-    }
-
-    for (const file of dashFiles) {
-      const filePath = path.join(DASHFilePath, file);
-      const filenameList = filePath.split('/');
-      const filename = filenameList[filenameList.length - 1];
-      // const ext = path.extname(filename)
-      if (fs.statSync(filePath).isFile()) {
-        const encryptFileAtRestPath = `./encryptAtRest/DASHEncrypted/${fileNameNew}`;
-        await encrypt_segment(filePath, encryptFileAtRestPath, file, (encryptedBuffer) => {
-          const targetHeaders = {
-            'content-type': 'application/json',
-            'dataType': 'json',
-            'filename': fileNameNew,
-            'segmentname':filename,
-            'type': 'DASH'
-          };
-          const encryptedFileObject = {
-            "fileData": encryptedBuffer
-          } 
-          const targetUrl = 'https://streamerpro.xyz/api/uploadVideo'; // Replace with the appropriate endpoint on the target server
-          axios.post(targetUrl, encryptedFileObject, { headers: targetHeaders })
-            .then((response) => {
-              // Handle the response
-              console.log(`response status: ${response.status}`)
-              console.log('Segment is uploaded'); // Assuming you want to send the response back to the original request
-            })
-            .catch((error) => {
-              // Handle the error
-              console.log(`response status: ${error.response.status}`)
-              console.error(error);
-              return callback(error, null)
+      
+      console.log(newData)
+      fs.writeFile('./encryptAtRest/encryption-list/encryptionLst.txt', newData, async () => {
+        for(const file of hlsFiles){
+          const filePath = path.join(HLSFilePath, file);
+          const filenameList = filePath.split('/');
+          const filename = filenameList[filenameList.length - 1];
+          // const ext = path.extname(filename)
+          if (fs.statSync(filePath).isFile()) {
+            const encryptFileAtRestPath = `./encryptAtRest/HLSEncrypted/${fileNameNew}`;
+            await encrypt_segment(filePath, encryptFileAtRestPath, file, (encryptedBuffer) => {
+              const targetHeaders = {
+                'content-type': 'application/json',
+                'dataType': 'json',
+                'filename': fileNameNew,
+                'segmentname':filename,
+                'type': 'HLS'
+              };
+              const encryptedFileObject = {
+                "fileData": encryptedBuffer
+              } 
+              const targetUrl = 'https://streamerpro.xyz/api/uploadVideo'; // Replace with the appropriate endpoint on the target server
+              axios.post(targetUrl, encryptedFileObject, { headers: targetHeaders })
+                .then((response) => {
+                  // Handle the response
+                  console.log(`response status: ${response.status}`)
+                  console.log('Segment is uploaded'); // Assuming you want to send the response back to the original request
+                })
+                .catch((error) => {
+                  // Handle the error
+                  console.log(`response status: ${error.response.status}`)
+                  console.error(error);
+                  return callback(error, null)
+                });
+              // encryptedSegmentsBuffer.HLS.push({ [filename]: encryptedBuffer });
             });
+          }
+        }
+    
+        for (const file of dashFiles) {
+          const filePath = path.join(DASHFilePath, file);
+          const filenameList = filePath.split('/');
+          const filename = filenameList[filenameList.length - 1];
+          // const ext = path.extname(filename)
+          if (fs.statSync(filePath).isFile()) {
+            const encryptFileAtRestPath = `./encryptAtRest/DASHEncrypted/${fileNameNew}`;
+            await encrypt_segment(filePath, encryptFileAtRestPath, file, (encryptedBuffer) => {
+              const targetHeaders = {
+                'content-type': 'application/json',
+                'dataType': 'json',
+                'filename': fileNameNew,
+                'segmentname':filename,
+                'type': 'DASH'
+              };
+              const encryptedFileObject = {
+                "fileData": encryptedBuffer
+              } 
+              const targetUrl = 'https://streamerpro.xyz/api/uploadVideo'; // Replace with the appropriate endpoint on the target server
+              axios.post(targetUrl, encryptedFileObject, { headers: targetHeaders })
+                .then((response) => {
+                  // Handle the response
+                  console.log(`response status: ${response.status}`)
+                  console.log('Segment is uploaded'); // Assuming you want to send the response back to the original request
+                })
+                .catch((error) => {
+                  // Handle the error
+                  console.log(`response status: ${error.response.status}`)
+                  console.error(error);
+                  return callback(error, null)
+                });
+    
+              // encryptedSegmentsBuffer.DASH.push({ [filename]: encryptedBuffer });
+            });
+          }
+        }
+    
+        return callback(null, null)
+    
+      })
+    })
+    .catch(error => {
+      // Handle the error
+      console.error(error);
+    });
 
-          // encryptedSegmentsBuffer.DASH.push({ [filename]: encryptedBuffer });
-        });
-      }
-    }
-
-    return callback(null, null)
 
   } catch (err) {
     console.error(err);
