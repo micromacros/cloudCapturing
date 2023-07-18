@@ -2,13 +2,12 @@ const cryptoFunctions = require("./stream_encryption/streamEncrypt_cryptoFunctio
 const fs = require('fs')
 const path = require('path')
 var delFile = require('./stream_encryption/model/delFile')
-var axios = require('axios')
-
-
+const axios = require('axios')
 
 const crypto_process = async (proxyRes, decryptedFile, callback) => {
-    const encryptionListFile = './stream_encryption/encryption-list/encryptionLst.txt'
+
     // get list of encryptions
+    const encryptionListFile = './stream_encryption/encryption-list/encryptionLst.txt'
     axios.get('https://creamsecurity.cloud/api/encryption-list/IT')
     .then(response => {
       // Handle the response data
@@ -38,7 +37,8 @@ const crypto_process = async (proxyRes, decryptedFile, callback) => {
     }).catch(error => {
         console.error(err);
     })
-    
+
+
 
     // get private key of server
     const serverPrivateKey = '../cloud-dashboard/Cloud-Page/Backend/RSA_Cloud/private_key.pem'

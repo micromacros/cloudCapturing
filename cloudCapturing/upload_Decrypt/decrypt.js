@@ -18,6 +18,7 @@ function newName(inputFile,outputFile){
     }
     newName += '.' + ext
     outputFile += newName
+    console.log(outputFile)
     return outputFile
 }
 function getDec(inputFile){

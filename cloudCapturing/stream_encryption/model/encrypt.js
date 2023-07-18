@@ -96,6 +96,42 @@ async function encrypt(inputFileStream,encFile, callback) {
 
 
   })
+  // }
+  // catch(error) {
+  //   console.log(error)
+  // }
+
+
+
+
+    // console.log('*****Encrypted File is written in '+ inputFile)
+
+    // const encryptedFile = inputFile
+
+    // let data = Buffer.alloc(0); // Initialize an empty buffer
+
+    // const readableStream = fs.createReadStream(inputFile);
+    
+    // readableStream.on('data', (chunk) => {
+    //   // Concatenate each chunk of data to the existing data buffer
+    //   data = Buffer.concat([data, chunk]);
+    // });
+    
+    // readableStream.on('end', () => {
+    //   // End of the stream, all data has been read
+    //   console.log('Finished reading the file.');
+    //   // console.log('Data:', data.toString()); // Use data as needed
+    // });
+
+    // readableStream.on('finish', () => {
+    //   delFile(outputFilePath)
+    //   return data
+    // })
+    
+    // readableStream.on('error', (err) => {
+    //   // Error occurred while reading the file
+    //   console.error('Error reading the file:', err);
+    // });
 
 
 }

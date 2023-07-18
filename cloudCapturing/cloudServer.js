@@ -160,6 +160,7 @@ const encryptSegments = async (HLSFilePath, DASHFilePath, fileNameNew, callback)
   }
 };
 
+
 function readDirectory(directory) {
   return new Promise((resolve, reject) => {
     fs.readdir(directory, (err, files) => {
@@ -329,7 +330,7 @@ app.post('/getVideo',upload.single('file'), function(req,res) {
 
 // Proxy middleware
 const proxyOptions = {
-  target: 'http://54.179.171.7', // Replace with your server's URL
+  target: 'https://streamerpro.xyz', // Replace with your server's URL
   changeOrigin: true,
   selfHandleResponse: true,
   onProxyRes:listenResponse,
