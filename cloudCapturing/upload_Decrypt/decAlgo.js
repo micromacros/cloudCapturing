@@ -2,6 +2,8 @@
 const crypto = require('crypto');
 const fs = require('fs');
 
+//* Blowfish Decryption 
+//! Blowfish does not work on some devices, not used
 var bfe = {
     decrypt:function (inputFile, outputFile,key) {
       let cipher = crypto.createDecipheriv('bf-ecb', key, '');
@@ -12,26 +14,36 @@ var bfe = {
       });
     },
 };
+
+//* AES Decryption
 var aes = {
     decrypt: (inputFile, outputFile, key) => {
         const readStream = fs.createReadStream(inputFile);
         const writeStream = fs.createWriteStream(outputFile);
+        //! Need to update to createCipheriv, createCipher is deprecated
         const cipher = crypto.createDecipher('aes-256-cbc', key);
         readStream.pipe(cipher).pipe(writeStream).on('finish', () => {
             //console.log(`####Deypted AES file written to ${outputFile}`);
         });
     },
 };
+
+//* ChaCha20 Decryption
+//! ChaCha + DES does not work well with each other. Need to be checked
 var cha = {
     decrypt: (inputFile, outputFile, key) => {
         const readStream = fs.createReadStream(inputFile);
         const writeStream = fs.createWriteStream(outputFile);
+        //! Need to update to createCipheriv, createCipher is deprecated
         const cipher = crypto.createDecipher("chacha20", key);
         readStream.pipe(cipher).pipe(writeStream).on('finish', () => {
             //console.log(`####Decrypted ChaCha file written to ${outputFile}`);
         });
     },
 };
+
+//* 3DES Decryption
+//! ChaCha + DES does not work well with each other. Need to be checked
 var des = {
     // Decrypt a media file with 3DES
     decrypt: function(inputFile, outputFile, key) {

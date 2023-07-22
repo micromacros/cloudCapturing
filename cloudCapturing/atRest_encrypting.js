@@ -6,33 +6,27 @@ var delFile = require('./encryptAtRest/model/delFile')
 
 
 const crypto_process = async (segmentPath, outputFilePath, filename, callback) => {
-    var filenameWOExt = path.parse(filename).name
-    // console.log(filename)
-    // console.log(filenameWOExt)
-    
-    // console.log(req)
-
     var unencryptFilePath = segmentPath
     // File directory to write encrypted file to
-    // get list of encryptions
+    //* get list of encryptions
     const encryptionListFile = './encryptAtRest/encryption-list/encryptionLst.txt'
 
-    // get private key of server
+    //* get private key of server
     const serverPrivateKey = '../cloud-dashboard/Cloud-Page/Backend/RSA_Cloud/private_key.pem'
 
-    //get public key of client
+    //* get public key of client
     const clientPublicKey = '../cloud-dashboard/Cloud-Page/Backend/RSA_Cloud/public_key.pem'
 
-    // generate digital signature
+    //* generate digital signature
     console.log('generating signature...')
     await cryptoFunctions.signFile(unencryptFilePath,serverPrivateKey, filename, async (err, signatureFilePath) => {
         if (err) {
             console.log(err)
         }
         else{            
-            // encrypt segments
+            //* encrypt segments
             console.log('Encrypting segment...')
-            // unencryptedFileStream = await readFileStream(unencryptFilePath)
+            //* unencryptedFileStream = await readFileStream(unencryptFilePath)
             await cryptoFunctions.encryptFile(encryptionListFile, unencryptFilePath, outputFilePath,filename, 
                 async (err, encryptedBuffer) => {
                     if (err) {
@@ -40,7 +34,7 @@ const crypto_process = async (segmentPath, outputFilePath, filename, callback) =
                     }
                     else{
                         
-                        // encrypt keyFile with RSA
+                        //* encrypt keyFile with RSA
                         console.log('Encrypting Key File...')
                         const encryptedKeyFilePath = `./key/atRestKeyFile/encKey_${filename}.bin`
                         const unencryptedKeyFile = `./key/atRestKeyFile/${filename}.bin`

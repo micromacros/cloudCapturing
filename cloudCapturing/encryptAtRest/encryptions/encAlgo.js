@@ -1,7 +1,9 @@
 //all the encryptions here
 const crypto = require('crypto');
 const fs = require('fs');
-
+//!
+//! Blowfish Encryption (Does not work on certain machines therefore should be 
+//!                      blocked on website)
 var bfe = {
     encrypt: async function (inputFile, outputFile, filename, key) {
         if (key == null || key == ''){
@@ -10,16 +12,16 @@ var bfe = {
             keyobj.bfe = key
             const myjson = JSON.stringify(keyobj)
             fs.writeFileSync(`./key/atRestKeyFile/${filename}.bin`,myjson)
-            //console.log(`####New Blowfish key generated and saved to key.bin`)
         }
         let cipher = crypto.createCipheriv('bf-ecb', key, '');
         let input = fs.createReadStream(inputFile);
         let output = fs.createWriteStream(outputFile);
         input.pipe(cipher).pipe(output).on('finish', () => {
-            //console.log(`####Encrypted BlowFish file written to ${outputFile}`);
         });
     },
 };
+
+//* AES Encryption
 var aes = {
     encrypt: async (inputFile, outputFile, filename, key) => {
         if (key == null || key == ''){
@@ -36,17 +38,21 @@ var aes = {
         const writeStream = fs.createWriteStream(outputFile);
         
         // Creating cipher object
+        //! Need to update to createCipheriv, createCipher is deprecated 
         const cipher = crypto.createCipher('aes-256-cbc', key);
         // var iv = crypto.randomBytes(16)
         // const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
 
-        // Encrypting the file stream into a new output file
+        //* Encrypting the file stream into a new output file
         readStream.pipe(cipher).pipe(writeStream).on('finish', async () => {
           console.log('AES Encryption completed')
           return
         });
     },
 };
+
+//* ChaCha Encryption
+//! ChaCha + DES does not work well with each other. Need to be checked
 var cha = {
     encrypt: async (inputFile, outputFile, filename, key) => {
         if (key == null || key == ''){
@@ -64,6 +70,7 @@ var cha = {
         const writeStream = fs.createWriteStream(outputFile);
 
         // creating cipher object
+        //! Need to update to createCipheriv, createCipher is deprecated 
         const cipher = crypto.createCipher("chacha20", key);
         // var iv = crypto.randomBytes(16)
         // const cipher = crypto.createCipheriv("chacha20", key, iv);
@@ -75,6 +82,9 @@ var cha = {
           });
     },
 };
+
+//* 3DES Encryption
+//! ChaCha + DES does not work well with each other. Need to be checked
 var des = {
     encrypt: async function(inputFile, outputFile, filename, key) {
         if (key == null || key == ''){

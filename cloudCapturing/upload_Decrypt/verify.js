@@ -1,6 +1,7 @@
 const fs = require('fs');
 const crypto = require('crypto');
 
+//* Verifying signature
 function verify(input,signature,keyFile){
     const publicKey = fs.readFileSync(keyFile);
     // const video = fs.readFileSync(input);
