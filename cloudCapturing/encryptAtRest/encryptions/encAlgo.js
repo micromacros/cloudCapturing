@@ -1,8 +1,10 @@
 //all the encryptions here
 const crypto = require('crypto');
 const fs = require('fs');
-//!
-//! Blowfish Encryption (Does not work on certain machines therefore should be 
+
+
+//* Blowfish Encryption
+//! (Does not work on certain machines therefore should be 
 //!                      blocked on website)
 var bfe = {
     encrypt: async function (inputFile, outputFile, filename, key) {
@@ -51,8 +53,8 @@ var aes = {
     },
 };
 
-//* ChaCha Encryption
-//! ChaCha + DES does not work well with each other. Need to be checked
+//* ChaCha20 Encryption
+//! ChaCha + DES does not work well with each other.
 var cha = {
     encrypt: async (inputFile, outputFile, filename, key) => {
         if (key == null || key == ''){
@@ -84,7 +86,7 @@ var cha = {
 };
 
 //* 3DES Encryption
-//! ChaCha + DES does not work well with each other. Need to be checked
+//! ChaCha + DES does not work well with each other.
 var des = {
     encrypt: async function(inputFile, outputFile, filename, key) {
         if (key == null || key == ''){

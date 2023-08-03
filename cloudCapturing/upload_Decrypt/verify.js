@@ -3,13 +3,14 @@ const crypto = require('crypto');
 
 //* Verifying signature
 function verify(input,signature,keyFile){
+    //* Reading Server's public key
     const publicKey = fs.readFileSync(keyFile);
-    // const video = fs.readFileSync(input);
+
+    //* Creating Hash of decrypted file
     const hash = crypto.createHash('sha256').update(input).digest();
-    // const signatureData = fs.readFileSync(signature).toString();
     const verify = crypto.createVerify('RSA-SHA256');
     verify.write(hash);
-    // Verify the signature
+    //* Verify the signature
     const isVerified = verify.verify(publicKey, signature.toString(), 'base64');
     console.log('Verification result:', isVerified);
     return isVerified
