@@ -65,30 +65,29 @@ const createDir = async (encFileDirectory, callback) => {
     })
 }
 
-const decrypt_process = async (proxyRes, sigFile, encKeyFile,atRestList, callback) => {
-
-
+const decrypt_process = async (proxyRes, sigFile, encKeyFile, callback) => {
+    
     var filename = proxyRes.headers.filename
     var filenameWOExt = path.parse(filename).name
     var ext = path.extname(filename)
-
     var encKeyFilePath = encKeyFile 
-
     const enc = JSON.parse(fs.readFileSync(encKeyFilePath))
     const encList = Object.keys(enc)
     var encFileName = ''
     encFileName += filenameWOExt
+    //* Final file name with encryption algorithms
     var encFileNameFinal = await createFileName(encFileName, encList, ext)
-
     var encFileDirectory = `./decryptAtRest/public/encryptedFiles/${filenameWOExt}/`
     var decFileDirectory = `./decryptAtRest/public/decryptedFile/`
+
+
     await createDir(encFileDirectory, async () => {
         await createDir(decFileDirectory, async () => {
             console.log('encrypted file path created...')
             var encFilePath = encFileDirectory+encFileNameFinal
 
             var sigFilePath = sigFile
-
+            //* Write segment into file
             await writeToFile(proxyRes, encFilePath)
             console.log('Encrypted File Written')
 

@@ -193,10 +193,10 @@ const listenResponse = async (proxyRes, req, res) => {
   const fileHeader = proxyRes.headers.cream_encrypt// Check 'cream_encrypt' Header has value True
   const manifest_type = proxyRes.headers.manifest_type // Read Type of Manifest file
   const filename = proxyRes.headers.filename
-
-
-
-  if (fileHeader){ //Check if Header ('File', 'Header') is present in response (header will change)
+  
+  //* Checks whether response requires encryption using 
+  //* custom file header 
+  if (fileHeader){ 
     console.log('This file needs encryption')
 
     if (manifest_type == 'HLS'){ //If Manifest File is HLS
@@ -207,15 +207,13 @@ const listenResponse = async (proxyRes, req, res) => {
       console.log('This is a DASH file segment/manifest')
       console.log(filename)
     }
-
+    //* Decrypting Segments at Rest
     console.log('decrypting segment encrypted at rest...')
 
     const encKeyFilePath = `./key/atRestKeyFile/encKey_${filename}.bin`
-    const segmentSig = `./encryptAtRest/public/atRestSig/${filename}.sig`
-    const atRestList = `./encryptAtRest/encryption-list/encryptionLst.txt`
-    
+    const segmentSig = `./encryptAtRest/public/atRestSig/${filename}.sig`    
 
-    await decrypt_atRest(proxyRes,segmentSig, encKeyFilePath,atRestList, async (err, decryptedFile) => {
+    await decrypt_atRest(proxyRes,segmentSig, encKeyFilePath, async (err, decryptedFile) => {
       if (err){
         if (err == 401){
           console.log('File Verification Failed')
@@ -228,6 +226,7 @@ const listenResponse = async (proxyRes, req, res) => {
       }
       else{
         console.log('Segment Decrypted At Rest')
+        //* Encrypting segments in transit
         await crypto_process(proxyRes, decryptedFile, async (encryptedJSON) => {
     
           // Send the new response with the encrypted file content
@@ -265,7 +264,6 @@ app.post('/getVideo',upload.single('file'), function(req,res) {
   var pubKey = `../cloud-dashboard/Cloud-Page/Backend/RSA_Local_Software/${ipaddr}/public_key.pem`
   var privKey = '../cloud-dashboard/Cloud-Page/Backend/RSA_Cloud/private_key.pem'
   var encKey = req.body.Key //* ENCRYPTED KEY FILE
-  // decrypting key file
   key = rsaenc.decryptKey(encKey,privKey) //* DECRYPTING ENC KEY FILE
   var keySig =req.body.Key_Signature
   var signature = req.body.Signature

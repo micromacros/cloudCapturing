@@ -56,15 +56,13 @@ const crypto_process = async (proxyRes, decryptedFile, callback) => {
     // File directory to write encrypted file to
     var outputFilePath = `./stream_encryption/public/encryptedFiles/${filenameWOExt}/` 
 
-    // Create the directory for the above file directory
+    //* Create the directory for the above file directory
     fs.mkdir(outputFilePath, { recursive: true}, (err) => {
         if (err) {
             console.log(err);
             return;
         }
     })
-
-
 
     try {
         fs.readFile(decryptedFile, async(err, data) => {
@@ -80,7 +78,7 @@ const crypto_process = async (proxyRes, decryptedFile, callback) => {
                     }
                     else{
                         console.log('File is written')
-                        // generate digital signature
+                        //* generate digital signature
                         console.log('generating signature...')
                         await cryptoFunctions.signFile(filePath, serverPrivateKey, async (err, signatureFilePath) => {
                             if (err) {
@@ -91,17 +89,14 @@ const crypto_process = async (proxyRes, decryptedFile, callback) => {
                                 var fileSigData = fs.readFileSync(fileSigPath)
         
                                 
-                                // encrypt segments
+                                // *encrypt segments
                                 console.log('Encrypting segment...')
                                 await cryptoFunctions.encryptFile(encryptionListFile, proxyRes, async (err, encryptedBuffer) => {
                                     if (err) {
                                         console.log(err)
                                     }
                                     else{
-                                        
-                                        // console.log('\n\nencrypted buffer\n\n', encryptedBuffer, '\n\n') 
-                                        
-                                        // encrypt keyFile with RSA
+                                        // *encrypt keyFile with RSA
                                         console.log('Encrypting Key File...')
                                         const encryptedKeyFilePath = './key/encKey.bin'
                                         const unencryptedKeyFile = './key/key.bin'
