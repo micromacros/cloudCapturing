@@ -210,8 +210,8 @@ const listenResponse = async (proxyRes, req, res) => {
     //* Decrypting Segments at Rest
     console.log('decrypting segment encrypted at rest...')
 
-    const encKeyFilePath = `./key/atRestKeyFile/encKey_${filename}.bin`
-    const segmentSig = `./encryptAtRest/public/atRestSig/${filename}.sig`    
+    const encKeyFilePath = `../key_cloudCapturing/atRestKeyFile/encKey_${filename}.bin`
+    const segmentSig = `../key_cloudCapturing/atRestSig/${filename}.sig`    
 
     await decrypt_atRest(proxyRes,segmentSig, encKeyFilePath, async (err, decryptedFile) => {
       if (err){

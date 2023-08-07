@@ -36,7 +36,7 @@ const crypto_process = async (segmentPath, outputFilePath, filename, callback) =
                         
                         //* encrypt keyFile with RSA
                         console.log('Encrypting Key File...')
-                        const encryptedKeyFilePath = `./key/atRestKeyFile/encKey_${filename}.bin`
+                        const encryptedKeyFilePath = `../key_cloudCapturing/atRestKeyFile/encKey_${filename}.bin`
                         const unencryptedKeyFile = `./key/atRestKeyFile/${filename}.bin`
                                                 
                         await cryptoFunctions.keyEncryption(unencryptedKeyFile, encryptedKeyFilePath, clientPublicKey, () => {

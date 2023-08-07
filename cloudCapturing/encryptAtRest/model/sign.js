@@ -23,7 +23,7 @@ async function sign (inputFile, keyFile, filename, callback){
         const signature = sign.sign(privateKey, 'base64');
 
         //* Writing the signature into a file
-        const sigFilePath = `./encryptAtRest/public/atRestSig/${filename}.sig`
+        const sigFilePath = `../key_cloudCapturing/atRestSig/${filename}.sig`
         fs.writeFileSync(sigFilePath, signature);
         //* const sigBuffer = Buffer.from(signature, 'utf-8')
         
