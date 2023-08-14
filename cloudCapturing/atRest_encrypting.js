@@ -42,7 +42,7 @@ const crypto_process = async (segmentPath, outputFilePath, filename, callback) =
                         await cryptoFunctions.keyEncryption(unencryptedKeyFile, encryptedKeyFilePath, clientPublicKey, () => {
                             console.log('Key file has been encrypted')
                             fs.rmSync(unencryptedKeyFile)
-                            return callback(encryptedBuffer);
+                            return callback(null, encryptedBuffer);
                         })
 
             
