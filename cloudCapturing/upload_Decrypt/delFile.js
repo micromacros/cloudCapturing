@@ -5,7 +5,6 @@ function delFile(directory,exception){
   var files = fs.readdirSync(path);
   for(var i = 0;i<files.length;i++){
     var file = path+files[i];
-    console.log(file,exception)
     if(file!=exception){
       try {
         fs.unlinkSync(file);

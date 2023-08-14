@@ -89,7 +89,7 @@ const decrypt_process = async (proxyRes, sigFile, encKeyFile, callback) => {
             var sigFilePath = sigFile
             //* Write segment into file
             await writeToFile(proxyRes, encFilePath)
-            console.log('Encrypted File Written')
+            console.log('Encrypted Segment File Written and Stored') //! THIS
 
             var decKeyFilePath = './key/uploadKeyFile/key.bin'
             var serverPrivateKey = '../cloud-dashboard/Cloud-Page/Backend/RSA_Cloud/private_key.pem'

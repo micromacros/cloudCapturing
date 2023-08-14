@@ -14,7 +14,7 @@ function encryptKey(input,output,keyFile){
         // Gets the needed keys
         var value = keyDic[enc[i]]
         if (value === null || value === "" || (Array.isArray(value) && value.length === 0) || (typeof value === 'object' && Object.keys(value).length === 0)) {
-            console.log(`${enc[i]} is empty`)
+            console.log(`${enc[i]} is not used in this encryption.`)
         }
         else {
             if(enc[i] == 'des'){
@@ -35,6 +35,7 @@ function encryptKey(input,output,keyFile){
                 key
             );
             encDic[enc[i]]=encryptedData
+            console.log(`Symmetric Key File for ${enc[i]} is encrypted.`) 
         }
     }
     // console.log(encDic)

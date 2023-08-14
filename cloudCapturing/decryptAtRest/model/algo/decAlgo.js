@@ -21,6 +21,7 @@ var aes = {
         // const cipher = crypto.createDecipheriv('aes-256-cbc', key,iv);
         readStream.pipe(cipher).pipe(writeStream).on('finish', () => {
             console.log(`AES File Decryption Completed`);
+            console.log(`File ${outputFile} written and stored`)
         });
     },
 };
@@ -33,6 +34,7 @@ var cha = {
         // const cipher = crypto.createDecipheriv("chacha20", key, iv);        
         readStream.pipe(cipher).pipe(writeStream).on('finish', () => {
             console.log(`ChaCha20 File Decryption Completed`);
+            console.log(`File ${outputFile} written and stored`)
         });
     },
 };
@@ -57,6 +59,7 @@ var des = {
             outputStream.write(finalChunk);
             outputStream.end();
             console.log(`DES File Decryption Completed`);
+            console.log(`File ${outputFile} written and stored`)
         });
     }
 }

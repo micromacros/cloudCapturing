@@ -48,6 +48,7 @@ var aes = {
         //* Encrypting the file stream into a new output file
         readStream.pipe(cipher).pipe(writeStream).on('finish', async () => {
           console.log('AES Encryption completed')
+          console.log(`File ${outputFile} written and stored`)
           return
         });
     },

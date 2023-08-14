@@ -22,6 +22,7 @@ var aes = {
         const writeStream = fs.createWriteStream(outputFile);
         const cipher = crypto.createDecipher('aes-256-cbc', key);
         readStream.pipe(cipher).pipe(writeStream).on('finish', () => {
+            console.log(`File ${outputFile} written and stored`)
             //console.log(`####Deypted AES file written to ${outputFile}`);
         });
     },
@@ -35,6 +36,7 @@ var cha = {
         const writeStream = fs.createWriteStream(outputFile);
         const cipher = crypto.createDecipher("chacha20", key);
         readStream.pipe(cipher).pipe(writeStream).on('finish', () => {
+            console.log(`File ${outputFile} written and stored`)
             //console.log(`####Decrypted ChaCha file written to ${outputFile}`);
         });
     },
@@ -61,6 +63,7 @@ var des = {
             const finalChunk = decipher.final();
             outputStream.write(finalChunk);
             outputStream.end();
+            console.log(`File ${outputFile} written and stored`)
             //console.log(`####Decrypted DES file written to ${outputFile}`);
         });
     }

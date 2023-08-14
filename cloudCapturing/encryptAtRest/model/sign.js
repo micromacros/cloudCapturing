@@ -25,7 +25,7 @@ async function sign (inputFile, keyFile, filename, callback){
         //* Writing the signature into a file
         const sigFilePath = `../key_cloudCapturing/atRestSig/${filename}.sig`
         fs.writeFileSync(sigFilePath, signature);
-        //* const sigBuffer = Buffer.from(signature, 'utf-8')
+        console.log(`Signature File written to ${sigFilePath}`)
         
         return callback(null, sigFilePath);   
     }

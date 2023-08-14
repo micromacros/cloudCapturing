@@ -71,6 +71,7 @@ const encryptSegments = async (HLSFilePath, DASHFilePath, fileNameNew, callback)
       //* Writing new list of encryptions into text file
       fs.writeFile('./encryptAtRest/encryption-list/encryptionLst.txt', newData, async () => {
         //* Looping through each file in the HLS Directory
+        console.log('At Rest Encryption List written into encryptionLst.txt')
         for(const file of hlsFiles){
           const filePath = path.join(HLSFilePath, file);
           const filenameList = filePath.split('/');

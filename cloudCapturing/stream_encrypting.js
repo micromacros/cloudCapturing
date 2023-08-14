@@ -34,8 +34,10 @@ const crypto_process = async (proxyRes, decryptedFile, callback) => {
 
         fs.writeFileSync(encryptionListFile, newData)
       }
+    console.log('In Transit Encryption Algorithm is written into encryptionLst.txt')
+
     }).catch(error => {
-        console.error(err);
+        console.error(error);
     })
 
 
@@ -77,7 +79,7 @@ const crypto_process = async (proxyRes, decryptedFile, callback) => {
                         return
                     }
                     else{
-                        console.log('File is written')
+                        console.log('Newly Decrypted File is written into new directory.')
                         //* generate digital signature
                         console.log('generating signature...')
                         await cryptoFunctions.signFile(filePath, serverPrivateKey, async (err, signatureFilePath) => {

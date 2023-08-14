@@ -26,7 +26,6 @@ const crypto_process = async (segmentPath, outputFilePath, filename, callback) =
         else{            
             //* encrypt segments
             console.log('Encrypting segment...')
-            //* unencryptedFileStream = await readFileStream(unencryptFilePath)
             await cryptoFunctions.encryptFile(encryptionListFile, unencryptFilePath, outputFilePath,filename, 
                 async (err, encryptedBuffer) => {
                     if (err) {
